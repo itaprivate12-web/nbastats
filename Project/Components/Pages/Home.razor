@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Project.Data
 @inject UserService UserService
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
@@ -12,8 +13,38 @@
     </div>
     
     <div class="search">
+
         <input @bind="search" type="text" placeholder="Search for a Player or a Team... "/>
         <button class="btn btn-primary" @onclick="DoSearch"> Search </button>
+
+        @if (result.Count > 0)
+        {
+            <div class="search-dropdown">
+
+                @for (int i = 0; i < result.Count; i++)
+                {
+                    <div class="search-item">
+
+                        @if (IsPlayer)
+                        {
+                            <img src="@result[i].ImageUrl" />
+
+                            <p> @result[i].Name </p>
+                        }
+                        else
+                        {
+                            <img src="@result[i].LogoUrl" />
+                            <p> @result[i].TeamName </p>
+                        }
+
+                    </div>
+
+                }
+
+            </div>
+            
+        }
+
     </div>
     
      <div class="sign">
@@ -101,9 +132,11 @@
 
 @code {
     private string search = "";
+    private bool IsPlayer;
 
     private List<Player> players = new List<Player>();
     private List<Teams> teams = new List<Teams>();
+    private List<Search> result = new List<Search>();
 
     protected override void OnInitialized()
     {
@@ -116,7 +149,14 @@
 
     void DoSearch()
     {
+        if (UserService.IsPlayer(search))
+            IsPlayer = true;
+        else
+            IsPlayer = false;
+       
+        result = UserService.Search(search);
 
+        Console.WriteLine($"Search for '{search}' returned {result.Count} results");
     }
 
     void Login()
@@ -131,6 +171,30 @@
 }
 
 <style>
+
+    .search {
+        position: relative;
+    }
+
+    .search-dropdown {
+        position: absolute;
+        top: 40px;
+        width: 100%;
+        background: white;
+        border: 1px solid #ccc;
+        z-index: 1000;
+    }
+
+    .search-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px;
+    }
+
+        .search-item img {
+            width: 30px;
+        }
 
     .teams-container {
         display: grid;
