@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/itamar/Desktop/HTML/nbastats/Project/obj/Debug/net8.0/scopedcss/projectbundle/Project.bundle.scp.css",
+      "PackagePath": "staticwebassets/Project.bundle.scp.css"
+    },
+    {
+      "Id": "/Users/itamar/Desktop/HTML/nbastats/Project/wwwroot/app.css",
+      "PackagePath": "staticwebassets/app.css"
+    },
+    {
+      "Id": "/Users/itamar/Desktop/HTML/nbastats/Project/wwwroot/bootstrap/bootstrap.min.css",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css"
+    },
+    {
+      "Id": "/Users/itamar/Desktop/HTML/nbastats/Project/wwwroot/bootstrap/bootstrap.min.css.map",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css.map"
+    },
+    {
+      "Id": "/Users/itamar/Desktop/HTML/nbastats/Project/wwwroot/favicon.png",
+      "PackagePath": "staticwebassets/favicon.png"
+    },
+    {
+      "Id": "/Users/itamar/Desktop/HTML/nbastats/Project/wwwroot/images/nba.png",
+      "PackagePath": "staticwebassets/images/nba.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.Project.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.Project.props",
+      "PackagePath": "build\\Project.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.Project.props",
+      "PackagePath": "buildMultiTargeting\\Project.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.Project.props",
+      "PackagePath": "buildTransitive\\Project.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Project.Data
+@using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
 @rendermode InteractiveServer
 
@@ -8,13 +9,13 @@
 <div class="topbar">
 
     <div class="name">
-        NBA Stats 
-        <img src="images/NBA.png"/>
+        NBA Stats
+        <img src="images/NBA.png" />
     </div>
-    
+
     <div class="search">
 
-        <input @bind="search" type="text" placeholder="Search for a Player or a Team... "/>
+        <input @bind="search" type="text" placeholder="Search for a Player or a Team... " />
         <button class="btn btn-primary" @onclick="DoSearch"> Search </button>
 
         @if (result.Count > 0)
@@ -23,34 +24,52 @@
 
                 @for (int i = 0; i < result.Count; i++)
                 {
-                    <div class="search-item">
 
-                        @if (IsPlayer)
-                        {
-                            <img src="@result[i].ImageUrl" />
+                    @if (IsPlayer)
+                    {
+                        <a href="player/@result[i].Id">
+                            <div class="search-item">
 
-                            <p> @result[i].Name </p>
-                        }
-                        else
-                        {
-                            <img src="@result[i].LogoUrl" />
-                            <p> @result[i].TeamName </p>
-                        }
+                                <img src="@result[i].ImageUrl" />
+                                <p> @result[i].Name </p>
 
-                    </div>
+                            </div>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="team/@result[i].Id">
+                            <div class="search-item">
+
+                                <img src="@result[i].ImageUrl" />
+                                <p> @result[i].Name </p>
+
+                            </div>
+                        </a>
+                    }
 
                 }
 
             </div>
-            
+
+        }
+        @if (result.Count == 0 && search != "")
+        {
+            <div class="search-dropdown">
+
+                <div class="search-iteam">
+                    <p style="color: red;"> No Player / Team Found </p>
+                </div>
+
+            </div>
         }
 
     </div>
-    
-     <div class="sign">
-         <button class="btn btn-primary" @onclick="Login"> Login </button>
+
+    <div class="sign">
+        <button class="btn btn-primary" @onclick="Login"> Login </button>
         <button class="btn btn-primary" @onclick="Register"> Register </button>
-     </div>
+    </div>
 </div>
 
 <div class="menu">
@@ -149,11 +168,7 @@
 
     void DoSearch()
     {
-        if (UserService.IsPlayer(search))
-            IsPlayer = true;
-        else
-            IsPlayer = false;
-       
+        IsPlayer = UserService.IsPlayer(search);
         result = UserService.Search(search);
 
         Console.WriteLine($"Search for '{search}' returned {result.Count} results");
@@ -166,11 +181,27 @@
 
     void Register()
     {
-        
+
     }
 }
 
 <style>
+    .search-dropdown a {
+        text-decoration: none !important;
+        /* remove underline */
+        color: inherit;
+        /* keep text color */
+        display: flex;
+        /* match your .search-item layout */
+        align-items: center;
+        gap: 10px;
+        padding: 5px;
+    }
+
+    .search-dropdown a:hover {
+        background-color: #f0f0f0;
+        /* optional hover effect */
+    }
 
     .search {
         position: relative;
@@ -192,17 +223,20 @@
         padding: 5px;
     }
 
-        .search-item img {
-            width: 30px;
-        }
+    .search-item img {
+        width: 30px;
+    }
 
     .teams-container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* fit as many as possible per row */
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        /* fit as many as possible per row */
         gap: 10px;
         width: 100%;
-        max-width: 1200px; /* optional: limits total width */
-        margin: 0 auto; /* center on page */
+        max-width: 1200px;
+        /* optional: limits total width */
+        margin: 0 auto;
+        /* center on page */
         padding: 10px;
     }
 
@@ -218,43 +252,52 @@
         text-align: center;
     }
 
-        .team-card img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            margin-bottom: 5px;
-        }
+    .team-card img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        margin-bottom: 5px;
+    }
 
-        .team-card p {
-            font-size: 10px; /* small but readable */
-            margin: 0;
-        }
+    .team-card p {
+        font-size: 10px;
+        /* small but readable */
+        margin: 0;
+    }
 
     .players-container {
         display: flex;
-        flex-wrap: wrap; /* allows multiple rows if needed */
-        gap: 20px; /* spacing between cards */
-        justify-content: center; /* center the row of cards */
+        flex-wrap: wrap;
+        /* allows multiple rows if needed */
+        gap: 20px;
+        /* spacing between cards */
+        justify-content: center;
+        /* center the row of cards */
     }
 
     .player-card {
-        width: 300px; /* smaller width */
+        width: 300px;
+        /* smaller width */
         background: #e3e3e3;
         border: 3px solid black;
-        padding: 15px; /* smaller padding */
+        padding: 15px;
+        /* smaller padding */
         margin: 0;
     }
 
     .player-img {
-        width: 120px; /* smaller image to fit card */
+        width: 120px;
+        /* smaller image to fit card */
     }
 
     .player-text h2 {
-        font-size: 28px; /* smaller title */
+        font-size: 28px;
+        /* smaller title */
     }
 
     .player-stats p {
-        font-size: 20px; /* smaller stats text */
+        font-size: 20px;
+        /* smaller stats text */
     }
 
     .player-header {
@@ -264,7 +307,7 @@
     }
 
 
-   
+
 
     .team {
         font-size: 18px;
@@ -272,7 +315,7 @@
         margin-top: 8px;
     }
 
-  
+
 
     /* --- Top Bar --- */
     .topbar {
@@ -286,79 +329,84 @@
         background-color: #f8f9fa;
     }
 
-        .topbar .name {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-        }
+    .topbar .name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: bold;
+    }
 
-            .topbar .name img {
-                height: 30px;
-            }
+    .topbar .name img {
+        height: 30px;
+    }
 
-        .topbar .search {
-            display: flex;
-            flex: 1;
-            gap: 5px;
-            align-items: center;
-            max-width: 500px;
-        }
+    .topbar .search {
+        display: flex;
+        flex: 1;
+        gap: 5px;
+        align-items: center;
+        max-width: 500px;
+    }
 
-            .topbar .search input {
-                flex: 1;
-                padding: 6px 10px;
-                font-size: 16px;
-            }
+    .topbar .search input {
+        flex: 1;
+        padding: 6px 10px;
+        font-size: 16px;
+    }
 
-            .topbar .search button {
-                white-space: nowrap;
-            }
+    .topbar .search button {
+        white-space: nowrap;
+    }
 
-        .topbar .sign {
-            display: flex;
-            gap: 5px;
-        }
+    .topbar .sign {
+        display: flex;
+        gap: 5px;
+    }
 
-   .menu {
-    padding: 0; 
-    margin: 0 auto;
-    background-color: #e9ecef;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
-}
+    .menu {
+        padding: 0;
+        margin: 0 auto;
+        background-color: #e9ecef;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
+    }
 
-.menu-container {
-    display: flex;           /* horizontal layout */
-    gap: 10px;               /* space between boxes */
-    justify-content: center;  /* center menu items */
-    padding: 5px 0;           /* vertical padding */
-}
+    .menu-container {
+        display: flex;
+        /* horizontal layout */
+        gap: 10px;
+        /* space between boxes */
+        justify-content: center;
+        /* center menu items */
+        padding: 5px 0;
+        /* vertical padding */
+    }
 
-.menu-item {
-    border: 1px solid black;   /* box border */
-    border-radius: 4px;
-    background-color: #fff;
-    padding: 5px 10px;
-    text-align: center;
-    display: flex;             /* makes the fill the box */
-    align-items: center;
-    justify-content: center;
-}
+    .menu-item {
+        border: 1px solid black;
+        /* box border */
+        border-radius: 4px;
+        background-color: #fff;
+        padding: 5px 10px;
+        text-align: center;
+        display: flex;
+        /* makes the fill the box */
+        align-items: center;
+        justify-content: center;
+    }
 
-.menu-item a {
-    text-decoration: none;
-    color: black;
-    font-weight: bold;
-    display: block;           /* fill the .menu-item box */
-    width: 100%;
-}
+    .menu-item a {
+        text-decoration: none;
+        color: black;
+        font-weight: bold;
+        display: block;
+        /* fill the .menu-item box */
+        width: 100%;
+    }
 
-.menu-item:hover {
-    background-color: #d0d0d0;
-    cursor: pointer;
-}
-
-     
+    .menu-item:hover {
+        background-color: #d0d0d0;
+        cursor: pointer;
+    }
 </style>

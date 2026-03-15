@@ -28,23 +28,21 @@ namespace Project.Data
             return DbHelper.RunSelect<Teams>(sql);
         }
 
-        public bool IsPlayer(string name)
+        public bool IsPlayer(string search)
         {
-            string sql = "SELECT * FROM Players WHERE Name = {};";
+            string sql = "SELECT * FROM Players WHERE Name = {}";
 
-            if (DbHelper.RunSelect<Player>(sql, name).Count > 0)
-            {
+            if (DbHelper.RunSelect<Player>(sql, search).Count > 0)
                 return true;
-            }
-
+            
             return false;
         }
 
         public List<Search> Search(string search)
         {
-            string sql = @"SELECT Name, ImageUrl FROM Players WHERE Name LIKE {}
+            string sql = @"SELECT Id, Name, ImageUrl FROM Players WHERE Name LIKE {}
                         UNION 
-                        SELECT TeamName, LogoUrl FROM Teams WHERE TeamName LIKE {};";
+                        SELECT Id, TeamName, LogoUrl FROM Teams WHERE TeamName LIKE {};";
 
             string str = $"%{search}%";
 
