@@ -2,74 +2,138 @@
 @using Project.Data
 @using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
-@rendermode InteractiveServer
 
-<div class="player-page">
 
-    <div class="player-header">
-        <img src="@Player[0].ImageUrl" />
+@if (Player != null && Player.Count > 0)
+{
+    <div class="player-page">
+        <div class="player-header">
 
-        <div class="player-text">
-            <h1> @Player[0].Name </h1>
+            <img class="player-photo" src="@Player[0].ImageUrl" />
 
-            <p> @Teams[Player[0].TeamId].Name </p>
-            <p> @Player[0].Position </p>
+            <div class="player-text">
+                <h1> @Player[0].Name </h1>
+
+                <p> @Player[0].Name </p>
+                <p> @Player[0].Position </p>
+            </div>
+
+            <img class="team-photo" src="@Player[0].LogoUrl" />
+
         </div>
 
-        <img src="@Teams[Player[0].TeamId].LogoUrl" />
+        <div class="player-stats">
+
+            <p> Points Per Game: @Player[0].PPG </p>
+            <p> Asists Per Game: @Player[0].APG </p>
+            <p> Rebounds Per Game: @Player[0].RPG </p>
+
+        </div>
+
+        <div class="player-info">
+
+            <p> Height: @Player[0].Height </p>
+            <p> Weight: @Player[0].Weight </p>
+            <p> Draft Year: @Player[0].DraftYear </p>
+            <p> Draft Pick: @Player[0].DraftPick </p>
+
+        </div>
     </div>
-
-    <div class="player-stats">
-        <p> Points Per Game: @Player[0].PPG </p>
-        <p> Asists Per Game: @Player[0].APG </p>
-        <p> Rebounds Per Game: @Player[0].RPG </p>
-    </div>
-
-</div>
-
+}
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
-    List<Player> Player = new List<Player>();
-    List<Teams> Teams = new List<Teams>();
+    List<PlayerPage> Player = new List<PlayerPage>();
 
     protected override void OnInitialized()
     {
-        Player = UserService.GetPlayerById(Id);
-        Teams = UserService.GetAllTeams();
+        Player = UserService.GetPlayerPageById(Id);
     }
 }
 
 <style>
+    .player-page {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 25px;
+        background: #f5f5f5;
+        border: 2px solid black;
+        box-sizing: border-box;
+    }
+
+    /* --- Header --- */
     .player-header {
         display: flex;
         align-items: center;
-        gap: 20px;
+        justify-content: space-between;
+        margin-bottom: 30px;
     }
 
-    .player-img {
-        width: 100px;
-        height: 100px;
+    /* Player picture (left) */
+    .player-photo {
+        width: 130px;
+        height: 130px;
         object-fit: cover;
-        border-radius: 50%;
+        border-radius: 10px;
     }
 
+    /* Name and position (center) */
     .player-text {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        flex: 1;
+        text-align: center;
     }
 
-    .team-logo {
-        width: 80px;
-        height: 80px;
+    .player-text h1 {
+        font-size: 36px;
+        margin: 0;
+    }
+
+    .player-text .position {
+        font-size: 18px;
+        color: #666;
+        font-weight: 500;
+    }
+
+    /* Team logo (right) */
+    .team-photo {
+        width: 90px;
+        height: 90px;
         object-fit: contain;
     }
 
-    .position {
-        font-size: 16px;
-        color: #666;
+    /* --- Stats Section --- */
+    .player-stats {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+        background: white;
+        border: 2px solid black;
+        margin-bottom: 20px;
+    }
+
+    .player-stats p {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    /* --- Info Section --- */
+    .player-info {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+        background: white;
+        border: 2px solid black;
+    }
+
+    .player-info p {
+        font-size: 18px;
+        margin: 0;
     }
 </style>

@@ -64,5 +64,16 @@ namespace Project.Data
 
             return DbHelper.RunSelect<Search>(sql, str, str);
         }
+
+        public List<PlayerPage> GetPlayerPageById(int id)
+        {
+            string sql = @"SELECT Players.TeamId, Players.Name, Players.Position, Players.PPG, Players.APG, Players.RPG, Players.ImageUrl, Teams.TeamName, Teams.LogoUrl, Info.Weight, Info.Height, Info.DraftYear, Info.DraftPick
+                            FROM Players
+                            JOIN Info ON Players.Id = Info.PlayerId
+                            JOIN Teams ON Players.TeamId = Teams.Id
+                            WHERE Players.Id = {};";
+
+            return DbHelper.RunSelect<PlayerPage>(sql, id);
+        }
     }
 }

@@ -1,0 +1,140 @@
+@using Project.Data
+@inject UserService UserService
+
+<div class="topbar">
+
+    <div class="name">
+        NBA Stats
+        <img src="images/NBA.png" />
+    </div>
+
+    <div class="search">
+
+        <input @bind="search" type="text" placeholder="Search for a Player or a Team... " />
+        <button class="btn btn-primary" @onclick="DoSearch"> Search </button>
+
+        @if (result.Count > 0)
+        {
+            <div class="search-dropdown">
+
+                @for (int i = 0; i < result.Count; i++)
+                {
+
+                    @if (result[i].IsPlayer)
+                    {
+                        <a href="player/@result[i].Id">
+                            <div class="search-item">
+
+                                <img src="@result[i].ImageUrl" />
+                                <p> @result[i].Name </p>
+
+                            </div>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="team/@result[i].Id">
+                            <div class="search-item">
+
+                                <img src="@result[i].ImageUrl" />
+                                <p> @result[i].Name </p>
+
+                            </div>
+                        </a>
+                    }
+
+                }
+
+            </div>
+
+        }
+        @if (result.Count == 0 && search != "")
+        {
+            <div class="search-dropdown">
+
+                <div class="error">
+                    <p style="color: red;"> No Player / Team Found </p>
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+    <div class="sign">
+        <button class="btn btn-primary" @onclick="Login"> Login </button>
+        <button class="btn btn-primary" @onclick="Register"> Register </button>
+    </div>
+</div>
+
+
+@code {
+    private string search = "";
+    private List<Search> result = new List<Search>();
+
+    void DoSearch()
+    {
+        result = UserService.Search(search);
+
+        Console.WriteLine($"Search for '{search}' returned {result.Count} results");
+    }
+
+    void Login()
+    {
+
+    }
+
+    void Register()
+    {
+
+    }
+}
+
+<style>
+    /* --- Top Bar --- */
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        border: 1px solid black;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: #f8f9fa;
+    }
+
+    .topbar .name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: bold;
+    }
+
+    .topbar .name img {
+        height: 30px;
+    }
+
+    .topbar .search {
+        display: flex;
+        flex: 1;
+        gap: 5px;
+        align-items: center;
+        max-width: 500px;
+    }
+
+    .topbar .search input {
+        flex: 1;
+        padding: 6px 10px;
+        font-size: 16px;
+    }
+
+    .topbar .search button {
+        white-space: nowrap;
+    }
+
+    .topbar .sign {
+        display: flex;
+        gap: 5px;
+    }
+
+</style>

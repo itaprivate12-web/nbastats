@@ -1,0 +1,79 @@
+@using Project.Data
+@inject UserService UserService
+@rendermode InteractiveServer
+
+<div class="menu">
+    <div class="menu-container">
+
+        <div class="menu-item">
+            <a href="/"> Home </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="/players"> Players </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="/teams"> Teams </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="/build"> Build a Team </a>
+        </div>
+
+        <div class="menu-item">
+            <a href="/favorites"> Favorites </a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .menu {
+        padding: 0;
+        margin: 0 auto;
+        background-color: #e9ecef;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+    .menu-container {
+        display: flex;
+        /* horizontal layout */
+        gap: 10px;
+        /* space between boxes */
+        justify-content: center;
+        /* center menu items */
+        padding: 5px 0;
+        /* vertical padding */
+    }
+
+    .menu-item {
+        border: 1px solid black;
+        /* box border */
+        border-radius: 4px;
+        background-color: #fff;
+        padding: 5px 10px;
+        text-align: center;
+        display: flex;
+        /* makes the fill the box */
+        align-items: center;
+        justify-content: center;
+    }
+
+    .menu-item a {
+        text-decoration: none;
+        color: black;
+        font-weight: bold;
+        display: block;
+        /* fill the .menu-item box */
+        width: 100%;
+    }
+
+    .menu-item:hover {
+        background-color: #d0d0d0;
+        cursor: pointer;
+    }
+
+</style>
