@@ -5,40 +5,62 @@
 @inject NavigationManager Nav
 
 
-@if (Player != null && Player.Count > 0)
+@if (team != null && team.Count > 0)
 {
-    <div class="player-page">
-        <div class="player-header">
 
-            <img class="player-photo" src="@Player[0].ImageUrl" />
+    @foreach (var t in team)
+    {
+        <div class="team-page">
+            <div class="team-header">
 
-            <div class="player-text">
-                <h1> @Player[0].Name </h1>
+                <img class="team-photo" src="@t.LogoUrl" />
 
-                <p> @Player[0].Name </p>
-                <p> @Player[0].Position </p>
+                <div class="team-text">
+                    <h1> @t.TeamName </h1>
+                </div>
             </div>
 
-            <img class="team-photo" src="@Player[0].LogoUrl" />
+            <div class="team-info">
+
+                <p> ShortName: @t.ShortName </p>
+                <p> Weight: @t.Conference </p>
+                <p> Draft Year: @t.Arena </p>
+                <p> Draft Pick: @t.Coach </p>
+
+            </div>
+        </div>
+    }
+
+}
+
+@if (teamPlayers != null && teamPlayers.Count > 0)
+{
+    <h1> Team's Players: </h1>
+
+    <div class="players-container">
+
+    @foreach (var players in teamPlayers)
+    {
+        <div class="player-card" @onclick="(() => GoToPlayer(players.Id))">
+
+            <div class="player-head">
+                <img src="@players.ImageUrl" class="player-img">
+
+                <div class="player-txt">
+                    <h2>@players.Name</h2>
+                    <p class="team">@players.TeamName</p>
+                </div>
+            </div>
+
+            <div class="player-stat">
+                <p>Points Per Game: @players.PPG</p>
+                <p>Assist Per Game: @players.APG</p>
+                <p>Rebounds Per Game: @players.RPG</p>
+            </div>
 
         </div>
+    }
 
-        <div class="player-stats">
-
-            <p> Points Per Game: @Player[0].PPG </p>
-            <p> Asists Per Game: @Player[0].APG </p>
-            <p> Rebounds Per Game: @Player[0].RPG </p>
-
-        </div>
-
-        <div class="player-info">
-
-            <p> Height: @Player[0].Height </p>
-            <p> Weight: @Player[0].Weight </p>
-            <p> Draft Year: @Player[0].DraftYear </p>
-            <p> Draft Pick: @Player[0].DraftPick </p>
-
-        </div>
     </div>
 }
 
@@ -46,10 +68,124 @@
     [Parameter]
     public int Id { get; set; }
 
-    private List<TeamPage> Team = new List<TeamPage>();
+    private List<Project.Data.TeamPage> team = new List<Project.Data.TeamPage>();
+    private List<Player> teamPlayers = new List<Player>();
 
     protected override void OnInitialized()
     {
-        Team = UserService.GetTeamPageById(Id);
+        team = UserService.GetTeamPageById(Id);
+        teamPlayers = UserService.GetPlayersInTeam(Id);
     }
+
+    void GoToPlayer(int id)
+    {
+        Nav.NavigateTo($"/player/{id}");
+    }
+    
 }
+
+<style>
+
+     .player-card:hover {
+        background-color: #e9ecef; /* light gray on hover */
+        transform: scale(1.02); /* tiny zoom effect */
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    
+    .players-container {
+        display: flex;
+        flex-wrap: wrap;
+        /* allows multiple rows if needed */
+        gap: 20px;
+        /* spacing between cards */
+        justify-content: center;
+        /* center the row of cards */
+    }
+
+    .player-card {
+        width: 300px;
+        /* smaller width */
+        background: #e3e3e3;
+        border: 3px solid black;
+        padding: 15px;
+        /* smaller padding */
+        margin: 0;
+    }
+
+    .player-img {
+        width: 120px;
+        /* smaller image to fit card */
+    }
+
+    .player-txt h2 {
+        font-size: 28px;
+        /* smaller title */
+    }
+
+    .player-stat p {
+        font-size: 20px;
+        /* smaller stats text */
+    }
+
+    .player-head {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .team-page {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 25px;
+        background: #f5f5f5;
+        border: 2px solid black;
+        box-sizing: border-box;
+    }
+
+    /* --- Header --- */
+    .team-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        /* spacing between logo + text */
+        margin-bottom: 30px;
+    }
+
+    /* Team logo */
+    .team-photo {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+    }
+
+    /* Team name */
+    .team-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .team-text h1 {
+        font-size: 36px;
+        margin: 0;
+    }
+
+    /* --- Info Section --- */
+    .team-info {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+        background: white;
+        border: 2px solid black;
+        flex-wrap: wrap;
+        /* makes it responsive */
+        gap: 15px;
+    }
+
+    .team-info p {
+        font-size: 18px;
+        margin: 0;
+        font-weight: 500;
+    }
+</style>

@@ -2,6 +2,7 @@
 @using Project.Data
 @using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
+@inject NavigationManager Nav
 
 <h1> All NBA Teams: </h1>
 
@@ -9,11 +10,11 @@
 
 <div class="teams-container">
 
-    @for (int i = 0; i < teams.Count; i++)
+    @foreach (var t in teams)
     {
-        <div class="team-card">
-            <img src="@teams[i].LogoUrl" />
-            <p> @teams[i].TeamName </p>
+        <div class="team-card" @onclick="(() => GoToTeam(t.Id))">
+            <img src="@t.LogoUrl" />
+            <p> @t.TeamName </p>
         </div>
     }
 
@@ -26,9 +27,21 @@
     {
         teams = UserService.GetAllTeams();
     }
+
+    void GoToTeam(int Id)
+    {
+        Nav.NavigateTo($"/team/{Id}");
+    }
 }
 
 <style>
+
+    .team-card:hover {
+        background-color: #e9ecef; /* light gray on hover */
+        transform: scale(1.02); /* tiny zoom effect */
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
     .teams-container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));

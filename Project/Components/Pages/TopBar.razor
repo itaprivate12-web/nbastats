@@ -4,7 +4,7 @@
 
 <div class="topbar">
 
-    <div class="name">
+    <div class="name" @onclick="GoHome">
         NBA Stats
         <img src="images/NBA.png" />
     </div>
@@ -55,7 +55,7 @@
 
 
 
-        
+
         @if (result.Count == 0 && search != "")
         {
             <div class="search-dropdown">
@@ -80,6 +80,10 @@
     private string search = "";
     private List<Search> result = new List<Search>();
 
+    void GoHome()
+    {
+        Nav.NavigateTo("/");
+    }
     void DoSearch()
     {
         result = UserService.Search(search);
@@ -114,6 +118,40 @@
 }
 
 <style>
+    .name {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        /* space between text and image */
+        padding: 10px 15px;
+        background-color: #1d1f21;
+        color: #fff;
+        font-weight: bold;
+        font-size: 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        user-select: none;
+        /* prevents text selection on click */
+    }
+
+    .name img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .name:hover {
+        background-color: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .name:hover img {
+        transform: scale(1.1);
+    }
+
     .search-item {
         display: flex;
         align-items: center;

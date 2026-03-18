@@ -113,5 +113,26 @@ namespace Project.Data
 
             return DbHelper.RunSelect<Player>(sql);
         }
+
+        public List<Player> GetPlayersInTeam(int id)
+        {
+            string sql = "SELECT * FROM Players WHERE TeamId = {};";
+
+            return DbHelper.RunSelect<Player>(sql, id);
+        }
+
+        public List<Teams> SortByWest(List<Teams> teams)
+        {
+            string sql = "SELECT * FROM Teams WHERE Conference = 'West';";
+            
+            return DbHelper.RunSelect<Teams>(sql);
+        }
+
+        public List<Teams> SortByEast(List<Teams> teams)
+        {
+            string sql = "SELECT * FROM Teams WHERE Conference = 'East';";
+            
+            return DbHelper.RunSelect<Teams>(sql);
+        }
     }
 }

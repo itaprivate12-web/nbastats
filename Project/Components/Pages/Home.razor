@@ -45,11 +45,11 @@
 
 <div class="teams-container">
 
-    @for (int i = 0; i < teams.Count; i++)
+    @foreach (var teams in teams)
     {
-        <div class="team-card">
-            <img src="@teams[i].LogoUrl" />
-            <p> @teams[i].TeamName </p>
+        <div class="team-card" @onclick="(() => GoToTeam(teams.Id))">
+            <img src="@teams.LogoUrl" />
+            <p> @teams.TeamName </p>
         </div>
     }
 
@@ -69,6 +69,13 @@
         teams = UserService.GetAllTeams();
 
         Console.WriteLine($"Loaded {teams.Count} teams");
+    }
+
+    void GoToTeam(int Id)
+    {
+        result.Clear();
+        search = "";
+        Nav.NavigateTo($"/team/{Id}");
     }
 
     void DoSearch()
@@ -157,6 +164,12 @@
     }
 
     .player-card:hover {
+        background-color: #e9ecef; /* light gray on hover */
+        transform: scale(1.02); /* tiny zoom effect */
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .team-card:hover {
         background-color: #e9ecef; /* light gray on hover */
         transform: scale(1.02); /* tiny zoom effect */
         transition: background-color 0.2s ease, transform 0.1s ease;
