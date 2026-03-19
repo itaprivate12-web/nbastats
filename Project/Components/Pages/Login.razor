@@ -1,0 +1,112 @@
+@page "/login"
+@using Project.Data
+@using System.Diagnostics.Eventing.Reader
+@inject UserService UserService
+@inject NavigationManager Nav
+
+<div class="register-card">
+    <h2> Create Account </h2>
+
+    <p> Username or Email: </p>
+    <input @bind="name" />
+
+    <p> Password: </p>
+    <input @bind="password" type="password" />
+
+    <button class="btn btn-primary" @onclick="(() => DoLogin(name, password))"> Login </button>
+
+    @if (IsLoginAttempted && IsLogin)
+    {
+        <p style="color:green;"> Login Successfull </p>
+        Direct();
+    }
+    else if(IsLoginAttempted && !IsLogin) 
+    {
+        <p style="color:red;"> Wrong credentials </p>
+    }
+
+</div>
+
+@code {
+    public string name = "", password = "";
+    public bool IsLogin = false, IsLoginAttempted = false;
+
+    void DoLogin(string name, string password)
+    {
+        IsLoginAttempted = true;
+        IsLogin = IsLogin = UserService.CheckLogin(name, password);
+    }
+
+    void Direct()
+    {
+        Thread.Sleep(2000);
+        Nav.NavigateTo("/profile");
+    }
+}
+
+<style>
+    /* Page background */
+    body {
+        margin: 0;
+        background: #f5f5f5;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Center card */
+    .register-card {
+        width: 360px;
+        margin: 100px auto;
+        padding: 25px;
+        background: #ffffff;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    /* Title */
+    .register-card h2 {
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    /* Labels */
+    .register-card p {
+        margin: 10px 0 5px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    /* Inputs */
+    .register-card input {
+        width: 100%;
+        padding: 8px 10px;
+        margin-bottom: 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 0.95rem;
+    }
+
+    .register-card input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    /* Button */
+    .register-card .btn {
+        width: 100%;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 6px;
+        border: none;
+        background: #007bff;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .register-card .btn:hover {
+        background: #0056b3;
+    }
+
+</style>

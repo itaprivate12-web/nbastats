@@ -108,48 +108,51 @@
     }
     void Login()
     {
-
+        Nav.NavigateTo("/login");
     }
 
     void Register()
     {
-
+        Nav.NavigateTo("/register");
     }
 }
 
 <style>
+    /* Logo + text clickable style */
     .name {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        /* space between text and image */
-        padding: 10px 15px;
-        background-color: #1d1f21;
-        color: #fff;
+        padding: 5px 10px;
+        /* makes it feel like a button */
+        background-color: #e9ecef;
+        /* subtle contrast with white bar */
+        color: #000;
         font-weight: bold;
         font-size: 1.2rem;
-        border-radius: 8px;
+        border-radius: 6px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         user-select: none;
-        /* prevents text selection on click */
+    }
+
+    .name:hover {
+        background-color: #d4d9de;
+        /* slightly darker on hover */
+        transform: translateY(-1px);
+        /* tiny lift effect */
     }
 
     .name img {
         width: 30px;
         height: 30px;
         object-fit: contain;
-        transition: transform 0.3s ease;
-    }
-
-    .name:hover {
-        background-color: #333;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s ease;
     }
 
     .name:hover img {
-        transform: scale(1.1);
+        transform: scale(1.05);
+        /* subtle image zoom on hover */
     }
 
     .search-item {

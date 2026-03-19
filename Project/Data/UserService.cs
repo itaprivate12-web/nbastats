@@ -134,5 +134,20 @@ namespace Project.Data
             
             return DbHelper.RunSelect<Teams>(sql);
         }
+
+        public void CreateAccount(string fullName, string userName, string email, string password)
+        {
+            string sql = @"INSERT INTO Users(FullName, UserName, Email, Password)
+                        VALUES ({}, {}, {}, {})";
+
+            DbHelper.RunSqlChange(sql, fullName, userName, email, password);
+        }
+
+        public bool CheckLogin(string name, string password)
+        {
+            string sql = "SELECT * FROM Users WHERE UserName = {} AND Password = {} OR Email = {} AND Password = {}";
+
+            return DbHelper.RunSelect<Users>(sql, name, password, name, password).Count > 0;
+        }
     }
 }
