@@ -149,5 +149,14 @@ namespace Project.Data
 
             return DbHelper.RunSelect<Users>(sql, name, password, name, password).Count > 0;
         }
+
+        public List<Users> GetUserByLogin(string name, string password)
+        {
+            string sql = "SELECT * FROM Users WHERE UserName = {} AND Password = {} OR Email = {} AND Password = {}";
+
+            return DbHelper.RunSelect<Users>(sql, name, password, name, password);
+        }
+
+        public List<Users> CurrentUser { get; set; }
     }
 }
