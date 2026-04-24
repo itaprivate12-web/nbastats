@@ -1,0 +1,303 @@
+@page "/profile/{Id:int}"
+@using Project.Data
+@using Microsoft.AspNetCore.Components
+@using System.Diagnostics.Eventing.Reader
+@inject UserService UserService
+@inject LanguageService Lang
+@inject NavigationManager Nav
+
+
+@if (UserService.CurrentUser != null && UserService.CurrentUser.Count > 0)
+{
+    <div class="user-bar-profile">
+        <img src="@UserService.CurrentUser[0].ProfilePicture" class="pfp-profile" />
+        <p class="username-profile"> @UserService.CurrentUser[0].UserName </p>
+    </div>
+
+    <div class="menu-profile">
+
+        <div class="menu-header">
+            
+            <p class="menu-title"> @Lang.T("Favorites") </p>
+
+            <select class="favs-select" @bind="tab">
+
+                <option value="players"> Players </option>
+                <option value="teams"> Teams </option>
+
+            </select>
+
+        </div>
+            
+        <div class="favs-content">
+
+            @if (tab == "players")
+            {
+                <div class="player-container">
+
+                    @foreach (var players in players)
+                    {
+                        <div class="player-card" @onclick="(() => GoToPlayer(players.Id))">
+
+                            <div class="player-header">
+                                <img src="@players.ImageUrl" class="player-img">
+
+                                <div class="player-text">
+                                    <h2>@players.Name</h2>
+                                    <p class="team">@players.TeamName</p>
+                                </div>
+                            </div>
+
+                            <div class="player-stats">
+                                <p>Points Per Game: @players.PPG</p>
+                                <p>Assist Per Game: @players.APG</p>
+                                <p>Rebounds Per Game: @players.RPG</p>
+                            </div>
+
+                            <button class="fav-btn" @onclick:stopPropagation="true" @onclick="() => ToggleStarPlayer(players.Id)">
+                                @(UserService.CurrentUser != null && UserService.CurrentUser.Count > 0 &&
+                                    UserService.IsFavoritePlayer(UserService.CurrentUser[0].Id, players.Id) ? "★" : "☆")
+                            </button>
+                        </div>
+                    }
+
+                </div>
+            }
+            else if (tab == "teams")
+            {
+                @foreach (var t in teams)
+                {
+
+                }
+            }
+        </div>
+
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    string tab = "players";
+    bool isFavorite = false;
+    List<Player> players = new List<Player>();
+    List<Teams> teams = new List<Teams>();
+
+    protected override void OnInitialized()
+    {
+        players = UserService.GetAllFavoritePlayers(Id);
+        teams = UserService.GetAllFavoriteTeams(Id);
+    }
+
+    void ToggleStarPlayer(int playerId)
+    {
+        if (UserService.CurrentUser == null || UserService.CurrentUser.Count == 0) { return; }
+
+        int userId = UserService.CurrentUser[0].Id;
+
+        if (UserService.IsFavoritePlayer(userId, playerId))
+            UserService.RemoveFavoritePlayer(playerId, userId);
+        else
+            UserService.AddFavoritePlayer(playerId, userId);
+
+        
+        StateHasChanged();
+    }
+    void GoToPlayer(int Id)
+    {
+        Nav.NavigateTo($"/player/{Id}");
+    }
+}
+
+<style>
+    .player-container {
+        display: flex;
+        flex-wrap: wrap;
+        /* allows multiple rows if needed */
+        gap: 20px;
+        /* spacing between cards */
+        justify-content: center;
+        /* center the row of cards */
+    }
+
+    .player-card {
+        width: 300px;
+        /* smaller width */
+        background: #e3e3e3;
+        border: 3px solid black;
+        padding: 15px;
+        /* smaller padding */
+        margin: 0;
+    }
+
+    .player-card:hover {
+        background-color: #e9ecef;
+        /* light gray on hover */
+        transform: scale(1.02);
+        /* tiny zoom effect */
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .player-img {
+        width: 120px;
+        /* smaller image to fit card */
+    }
+
+    .player-text h2 {
+        font-size: 28px;
+        /* smaller title */
+    }
+
+    .player-stats p {
+        font-size: 20px;
+        /* smaller stats text */
+    }
+
+    .player-header {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .player-card {
+        position: relative;
+    }
+
+    .fav-btn {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+
+        background: transparent;
+        border: none;
+
+        font-size: 26px;
+        color: black;
+
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    /* hover */
+    .fav-btn:hover {
+        transform: scale(1.15);
+    }
+
+    /* active (favorited) */
+    .fav-btn.active {
+        color: gold;
+    }
+
+    .player-card {
+        width: 300px;
+        background: #e3e3e3;
+        border: 2px solid #000;
+        padding: 15px;
+        margin: 0;
+
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .user-bar-profile {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 15px;
+
+        padding: 20px;
+
+        background: #f8f9fa;
+
+        border-bottom: 1px solid #ddd;
+
+    }
+
+    .pfp-profile {
+
+        width: 50px;
+
+        height: 50px;
+
+        border-radius: 50%;
+
+        object-fit: cover;
+
+        border: 2px solid #ccc;
+
+    }
+
+    .username-profile {
+
+        font-size: 1.6rem;
+
+        font-weight: bold;
+
+        margin: 0;
+
+    }
+
+    .menu-profile {
+
+        padding: 20px;
+
+        border: 1px solid #ddd;
+
+        border-radius: 10px;
+
+        margin: 20px;
+
+        background: white;
+
+    }
+
+    .menu-header {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        margin-bottom: 15px;
+
+        border-bottom: 1px solid #eee;
+
+        padding-bottom: 10px;
+
+    }
+
+    .menu-title {
+
+        font-size: 1.1rem;
+
+        font-weight: bold;
+
+        margin: 0;
+
+        color: #333;
+
+    }
+
+    .favs-select {
+
+        padding: 6px 10px;
+
+        border-radius: 6px;
+
+        border: 1px solid #ccc;
+
+        font-size: 0.95rem;
+
+        cursor: pointer;
+
+    }
+
+    .favs-content {
+
+        padding: 10px 0;
+
+    }
+</style>

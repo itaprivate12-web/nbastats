@@ -1,10 +1,57 @@
 ﻿@inherits LayoutComponentBase
 @using Project.Components.Pages
 @using Project.Data
+@inject UserService UserService
+@inject LanguageService Lang
+@inject IJSRuntime JS
 
-<TopBar />
-<Menu />
 
-<div class="body-content">
-    @Body
+<div class="@Lang.CurrentDirection">
+    <TopBar />
+    <Menu />
+
+    <div class="body-content">
+        @Body
+    </div>
 </div>
+
+
+@code {
+    private bool loaded = false;
+
+    protected override void OnInitialized()
+    {
+        Lang.OnChange += async () => await InvokeAsync(StateHasChanged);
+    }
+    private async void HandleLanguageChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+    public void Dispose()
+    {
+        Lang.OnChange -= HandleLanguageChanged;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!loaded)
+        {
+            loaded = true;
+            
+            var userId = await JS.InvokeAsync<string>("localStorage.getItem", "userId");
+        
+            if (!string.IsNullOrEmpty(userId))
+            {
+                int userIdI = int.Parse(userId);
+
+                var user = UserService.GetUserById(userIdI);
+
+                if (user != null && user.Count > 0)
+                    UserService.CurrentUser = user;
+
+                await InvokeAsync(StateHasChanged);
+            }
+
+            Console.WriteLine($"Saved User: {userId}");
+        }
+    }
+}

@@ -1,105 +1,125 @@
-@page "/setup"
+@page "/setup/{Id:int}"
 @using Project.Data
-@using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
 @inject NavigationManager Nav
 
 <div class="setup-card">
-    <h2> Setup Your Profile </h2>
+    <h2>Setup Your Profile</h2>
 
-    <p> Favorite Player: </p>
+    <p>Favorite Player:</p>
 
-    <input placeholder="Search Player..." @bind="playerSearch" />
-    <div class="search-dropdown">
+    <div class="input-wrapper">
 
-        @foreach (var item in players.Where(p => p.Name.Contains(playerSearch, StringComparison.OrdinalIgnoreCase)))
+        <input placeholder="Search Player..." @bind="playerSearch" @bind:event="oninput" />
+
+        @if (!string.IsNullOrEmpty(playerSearch))
         {
-            <div class="search-item" @onclick="() => selectPlayer(item)">
+            <div class="search-dropdown">
 
-                <img src="@item.ImageUrl" />
-                <p> @item.Name </p>
-
+                @foreach (var item in players.Where(p => p.Name.Contains(playerSearch, StringComparison.OrdinalIgnoreCase)))
+                {
+                    <div class="search-item" @onclick="() => SelectPlayer(item)">
+                        <img src="@item.ImageUrl" />
+                        <p>@item.Name</p>
+                    </div>
+                }
             </div>
+        }
+    </div>
+
+    <p>Favorite Team:</p>
+    <div class="input-wrapper">
+        <input placeholder="Search Team..." @bind="teamSearch" @bind:event="oninput" />
+        @if (!string.IsNullOrEmpty(teamSearch))
+        {
+            <div class="search-dropdown">
+                @foreach (var item in teams.Where(t => t.TeamName.Contains(teamSearch, StringComparison.OrdinalIgnoreCase)))
+                {
+                    <div class="search-item" @onclick="() => SelectTeam(item)">
+                        <img src="@item.LogoUrl" />
+                        <p>@item.TeamName</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <p>Choose Profile Picture:</p>
+
+    <div class="picture-options">
+
+        @if (selectedPlayer != null)
+        {
+            <div class="picture-option @(picChoice == "player" ? "active" : "")" @onclick='() => picChoice = "player"'>
+                <img src="@selectedPlayer.ImageUrl" class="pfp-circle" />
+            </div>
+        }
+
+        @if (selectedTeam != null)
+        {
+            <div class="picture-option @(picChoice == "team" ? "active" : "")" @onclick='() => picChoice = "team"'>
+                <img src="@selectedTeam.LogoUrl" class="pfp-circle" />
+            </div>
+        }
+
+        @if (selectedPlayer == null && selectedTeam == null)
+        {
+            <p style="color:#aaa; font-size:0.85rem;">Search and select a player or team above.</p>
         }
 
     </div>
 
-    <p> Favorite Team: </p>
-
-    <input placeholder="Search Team..." @bind="teamSearch" />
-
-    <div class="search-dropdown">
-
-        @foreach (var item in teams.Where(t => t.TeamName.Contains(teamSearch, StringComparison.OrdinalIgnoreCase)))
-        {
-            <div class="search-item" @onclick="() => selectTeam(item)">
-
-                <img src="@item.LogoUrl" />
-                <p> @item.TeamName </p>
-
-            </div>
-        }
-
-    </div>
-
-    <p> Choose Profile Pciture: </p>
-
-    @if (selectedPlayer != null)
-    {
-        <div class="selected-preview">
-            <img src="@selectedPlayer.ImageUrl" />
-        </div>
-    }
-    else if (selectedTeam != null)
-    {
-        <div class="selected-preview">
-            <img src="@selectedTeam.LogoUrl" />
-        </div>
-    }
-
-    <button class="btn btn-primary" @onclick="saveProfile"> Save Picture </button>
-
+    <button class="btn btn-primary" @onclick="SaveProfile">Save Profile</button>
 </div>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
     List<Player> players = new List<Player>();
     List<Teams> teams = new List<Teams>();
 
-    List<Player> selectedPlayer = new List<Player>();
-    List<Teams> selectedTeam = new List<Teams>();
+    Player? selectedPlayer = null;
+    Teams? selectedTeam = null;
 
-    public string playerSearch = "";
-    public string teamSearch = "";
+    string playerSearch = "";
+    string teamSearch = "";
+    string picChoice = "";
 
-    void selectPlayer(List<Player> player)
+    protected override void OnInitialized()
+    {
+        players = UserService.GetAllPlayers();
+        teams = UserService.GetAllTeams();
+    }
+
+    void SelectPlayer(Player player)
     {
         selectedPlayer = player;
-        selectedTeam = null;
+        playerSearch = "";
+
+        if (picChoice != "team") picChoice = "player";
     }
 
-    void selectTeam(List<Teams> team)
+    void SelectTeam(Teams team)
     {
         selectedTeam = team;
-        selectedPlayer = null;
+        teamSearch = "";
+
+        if (picChoice != "player") picChoice = "team";
     }
 
-    void saveProfile()
+    void SaveProfile()
     {
-        if (UserService.CurrentUser == null)
-            return;
+        if (UserService.CurrentUser == null || UserService.CurrentUser.Count == 0) return;
 
-        if (selectedPlayer != null)
-        {
-            UserService.CurrentUser.ProfilePicture = selectedPlayer.ImageUrl;
-        }
-        else if (selectedTeam != null)
-        {
-            UserService.CurrentUser.ProfilePicture = selectedTeam;
-        }
+        string? picUrl = picChoice == "player" ? selectedPlayer?.ImageUrl
+                       : picChoice == "team"   ? selectedTeam?.LogoUrl
+                       : null;
 
-        Nav.NavigateTo($"/profile/{UserService.CurrentUser.Id}");
+        if (picUrl == null) return;
+
+        UserService.SetProfilePicture(UserService.CurrentUser[0].Id, picUrl);
+        Nav.NavigateTo("/");
     }
-
 }
 
 <style>
@@ -109,65 +129,6 @@
         font-family: 'Segoe UI', sans-serif;
     }
 
-    .selected-preview {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 10px;
-        padding: 10px;
-        border: 1px solid #007bff;
-        border-radius: 8px;
-        background: #f0f8ff;
-    }
-
-    .selected-preview img {
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-    }
-
-    .search-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px;
-        cursor: pointer;
-        /* 👈 shows hand */
-        transition: background-color 0.2s ease, transform 0.1s ease;
-    }
-
-    .search-item:hover {
-        background-color: #e9ecef;
-        /* 👈 light hover */
-        transform: scale(1.02);
-        /* 👈 tiny zoom */
-    }
-
-    .search-item img {
-        width: 35px;
-        height: 35px;
-        object-fit: cover;
-    }
-
-    .search-item p {
-        margin: 0;
-    }
-
-    .search-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: white;
-        border: 1px solid #ccc;
-        z-index: 1000;
-    }
-
-    .setup-card {
-        position: relative;
-    }
-
-    /* Center card */
     .setup-card {
         width: 360px;
         margin: 100px auto;
@@ -178,28 +139,26 @@
         text-align: left;
     }
 
-    /* Title */
     .setup-card h2 {
         margin-bottom: 20px;
         font-size: 1.5rem;
         color: #333;
     }
 
-    /* Labels */
     .setup-card p {
         margin: 10px 0 5px;
         font-size: 0.9rem;
         color: #555;
     }
 
-    /* Inputs */
     .setup-card input {
         width: 100%;
         padding: 8px 10px;
-        margin-bottom: 12px;
+        margin-bottom: 0;
         border-radius: 6px;
         border: 1px solid #ccc;
         font-size: 0.95rem;
+        box-sizing: border-box;
     }
 
     .setup-card input:focus {
@@ -207,20 +166,87 @@
         border-color: #007bff;
     }
 
-    /* Button */
+    /* this makes the dropdown attach right below the input */
+    .input-wrapper {
+        position: relative;
+        margin-bottom: 12px;
+    }
+
+    .search-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        max-height: 180px;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    .search-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        cursor: pointer;
+    }
+
+    .search-item:hover { background: #e9ecef; }
+
+    .search-item img {
+        width: 35px;
+        height: 35px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .search-item p { margin: 0; }
+
+    .picture-options {
+        display: flex;
+        gap: 15px;
+        margin: 10px 0 15px;
+        flex-wrap: wrap;
+    }
+
+    .picture-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        cursor: pointer;
+        width: 120px;
+        text-align: center;
+    }
+
+    .picture-option:hover { border-color: #007bff; background: #f0f8ff; }
+    .picture-option.active { border-color: #007bff; background: #e0f0ff; }
+
+    /* instagram-style circle pfp */
+    .pfp-circle {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+    }
+
+    .picture-option p { margin: 0; font-size: 0.8rem; color: #333; }
+
     .setup-card .btn {
         width: 100%;
         padding: 10px;
         margin-top: 10px;
         border-radius: 6px;
         border: none;
-        background: #007bff;
-        color: white;
         font-weight: 500;
         cursor: pointer;
     }
 
-    .setup-card .btn:hover {
-        background: #0056b3;
-    }
+    .setup-card .btn:hover { background: #0056b3; }
 </style>

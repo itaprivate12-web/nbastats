@@ -1,33 +1,44 @@
 @using Project.Data
 @inject UserService UserService
+@inject LanguageService Lang
 @rendermode InteractiveServer
 
 <div class="menu">
     <div class="menu-container">
 
         <div class="menu-item">
-            <a href="/"> Home </a>
+            <a href="/"> @Lang.T("Home") </a>
         </div>
 
         <div class="menu-item">
-            <a href="/players"> Players </a>
+            <a href="/players"> @Lang.T("Players") </a>
         </div>
 
         <div class="menu-item">
-            <a href="/teams"> Teams </a>
+            <a href="/teams"> @Lang.T("Teams") </a>
         </div>
 
         <div class="menu-item">
             <a href="/build"> Build a Team </a>
         </div>
 
-        <div class="menu-item">
-            <a href="/favorites"> Favorites </a>
-        </div>
 
+        <div class="menu-item">
+            <a href="/profile/@Id"> @Lang.T("Favorites") </a>
+        </div>
+        
     </div>
 </div>
 
+@code {
+    private int Id;
+
+    protected override void OnInitialized()
+    {
+        if (UserService.CurrentUser != null && UserService.CurrentUser.Count > 0)
+            Id = UserService.CurrentUser[0].Id;
+    }
+}
 <style>
     .menu {
         padding: 0;
@@ -75,5 +86,4 @@
         background-color: #d0d0d0;
         cursor: pointer;
     }
-
 </style>

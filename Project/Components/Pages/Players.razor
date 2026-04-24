@@ -78,21 +78,25 @@
 <style>
 
     .player-card:hover {
-        background-color: #e9ecef; /* light gray on hover */
-        transform: scale(1.02); /* tiny zoom effect */
+        background-color: #e9ecef;
+        /* light gray on hover */
+        transform: scale(1.02);
+        /* tiny zoom effect */
         transition: background-color 0.2s ease, transform 0.1s ease;
     }
 
     .header-container {
         display: flex;
         align-items: center;
-        gap: 20px; /* space between h1 and sort buttons */
-        flex-wrap: wrap; /* optional, allows wrapping on small screens */
+        gap: 20px;
+        /* space between h1 and sort buttons */
+        flex-wrap: wrap;
+        /* optional, allows wrapping on small screens */
     }
 
-        .header-container h1 {
-            margin: 0;
-        }
+    .header-container h1 {
+        margin: 0;
+    }
 
     .sort-bar {
         display: flex;
@@ -100,9 +104,9 @@
         gap: 8px;
     }
 
-        .sort-bar p {
-            margin: 0;
-        }
+    .sort-bar p {
+        margin: 0;
+    }
 
     .players-container {
         display: flex;
@@ -115,6 +119,7 @@
     }
 
     .player-card {
+        position: relative;
         width: 300px;
         /* smaller width */
         background: #e3e3e3;
@@ -144,5 +149,4 @@
         align-items: center;
         gap: 25px;
     }
-
 </style>

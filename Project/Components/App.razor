@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Project.Data
+@inject LanguageService Lang
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -12,9 +14,65 @@
     <HeadOutlet />
 </head>
 
-<body>
+<body @key="Lang.CurrentLanguage" dir="@Lang.CurrentDirection">
     <Routes @rendermode="InteractiveServer" />
     <script src="_framework/blazor.web.js"></script>
 </body>
+
+<style>
+    body[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+    }
+
+    body[dir="ltr"] {
+    direction: ltr;
+    text-align: left;
+    }
+
+    body[dir="rtl"] .topbar {
+    direction: rtl;
+    }
+
+    body[dir="rtl"] .search {
+    margin-right: auto;
+    margin-left: 0;
+    }
+
+    body[dir="ltr"] .search {
+    margin-left: auto;
+    }
+
+    body[dir="rtl"] .search-dropdown {
+    right: 0;
+    left: auto;
+    }
+
+    body[dir="rtl"] {
+    text-align: right;
+    }
+
+    body[dir="ltr"] {
+    text-align: left;
+    }
+
+    body[dir="rtl"] .sign {
+    flex-direction: row-reverse;
+    }
+
+    body[dir="rtl"] input {
+    text-align: right;
+    }
+
+    body[dir="rtl"] .search-dropdown {
+    right: 0;
+    left: auto;
+    }
+
+    body[dir="rtl"] .lang-menu {
+    right: auto;
+    left: 0;
+    }
+</style>
 
 </html>

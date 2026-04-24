@@ -3,6 +3,7 @@
 @using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <div class="register-card">
     <h2> Create Account </h2>
@@ -19,13 +20,19 @@
     <p> Password: </p>
     <input @bind="password" type="password" />
 
+    <div class="remember-row">
+        <input type="checkbox" @bind="rememberMe" />
+        <label> Remember Me </label>
+    </div>
+
     @if (IsRegisterAttempted && IsRegister)
     {
         <p style="color:green;"> User created successfully </p>
         Direct();
     }
 
-    <button class="btn btn-primary" @onclick="(() => DoRegister(fullName, userName, email, password))"> Register </button>
+    <button class="btn btn-primary" @onclick="(() => DoRegister(fullName, userName, email, password))"> Register
+    </button>
 
     <p class="login-link">
         Already have an account?
@@ -38,30 +45,47 @@
 @code {
     public string fullName = "", userName = "", email = "", password = "";
     public bool IsRegisterAttempted = false, IsRegister = false;
+    private bool rememberMe = false;
 
-    void DoRegister(string fullName, string userName, string email, string password)
+    async Task DoRegister(string fullName, string userName, string email, string password)
     {
+        var user = UserService.GetUserByLogin(userName, password);
+
         IsRegisterAttempted = true;
         UserService.CreateAccount(fullName, userName, email, password);
         IsRegister = true;
+
+        if (rememberMe)
+        {
+            UserService.CurrentUser = UserService.GetUserByLogin(userName, password);
+
+            await JS.InvokeVoidAsync("localStorage.setItem", "userId", user[0].Id.ToString());
+        }
+
+        Console.WriteLine($"User ({fullName}, {userName})");
     }
 
-    void Direct()
+    async Task Direct()
     {
-        Thread.Sleep(2000);
-        Nav.NavigateTo("/setup");
+        await Task.Delay(2000);
+
+        Nav.NavigateTo($"/setup/{UserService.CurrentUser[0].Id}");
     }
 }
 
 <style>
-    /* Page background */
     body {
         margin: 0;
         background: #f5f5f5;
         font-family: 'Segoe UI', sans-serif;
     }
 
-    /* Center card */
+    .remember-row input[type="checkbox"] {
+        width: auto;
+        margin-bottom: 0;
+        cursor: pointer;
+    }
+
     .register-card {
         width: 360px;
         margin: 100px auto;
@@ -72,14 +96,12 @@
         text-align: left;
     }
 
-    /* Title */
     .register-card h2 {
         margin-bottom: 20px;
         font-size: 1.5rem;
         color: #333;
     }
 
-    /* Labels */
     .register-card p {
         margin: 10px 0 5px;
         font-size: 0.9rem;
@@ -101,15 +123,12 @@
         border-color: #007bff;
     }
 
-    /* Button */
     .register-card .btn {
         width: 100%;
         padding: 10px;
         margin-top: 10px;
         border-radius: 6px;
         border: none;
-        background: #007bff;
-        color: white;
         font-weight: 500;
         cursor: pointer;
     }
@@ -118,7 +137,6 @@
         background: #0056b3;
     }
 
-    /* Login link */
     .login-link {
         margin-top: 15px;
         font-size: 0.9rem;

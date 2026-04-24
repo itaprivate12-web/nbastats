@@ -157,6 +157,82 @@ namespace Project.Data
             return DbHelper.RunSelect<Users>(sql, name, password, name, password);
         }
 
+        public void SetProfilePicture(int userId, string url)
+        {
+            string sql = @"UPDATE Users
+                        SET ProfilePicture = {}
+                        WHERE Id = {} ";
+
+            DbHelper.RunSqlChange(sql, url, userId);
+        }
+
         public List<Users> CurrentUser { get; set; }
+
+        public void AddFavoritePlayer(int playerId, int userId)
+        {
+            string sql = "INSERT INTO FavoritePlayers (UserId, PlayerId) VALUES ({}, {});";
+
+            DbHelper.RunSqlChange(sql, userId, playerId);
+        }
+
+        public void RemoveFavoritePlayer(int playerId, int userId)
+        {
+            string sql = "DELETE FROM FavoritePlayers WHERE UserId = {} AND PlayerId = {};";
+
+            DbHelper.RunSqlChange(sql, userId, playerId);
+        }
+
+        public bool IsFavoritePlayer(int userId, int playerId)
+        {
+            string sql = "SELECT * FROM FavoritePlayers WHERE UserId = {} AND PlayerId = {};";
+
+            return DbHelper.RunSelect<FavoritePlayers>(sql, userId, playerId).Count > 0;
+        }
+
+        public List<Player> GetAllFavoritePlayers(int userId)
+        {
+            string sql = @"SELECT Players.* FROM Players
+                        JOIN FavoritePlayers ON Players.Id = FavoritePlayers.PlayerId
+                        WHERE FavoritePlayers.UserId = {};";
+
+            return DbHelper.RunSelect<Player>(sql, userId);
+        }
+
+        public void AddFavoriteTeam(int teamId, int userId)
+        {
+            string sql = "INSERT INTO FavoritePlayers (UserId, TeamId) VALUES ({}, {});";
+
+            DbHelper.RunSqlChange(sql, userId, teamId);
+        }
+
+        public void RemoveFavoriteTeam(int teamId, int userId)
+        {
+            string sql = "DELETE FROM FavoritePlayers WHERE UserId = {} AND TeamId = {};";
+
+            DbHelper.RunSqlChange(sql, userId, teamId);
+        }
+
+        public bool IsFavoriteTeam(int userId, int teamId)
+        {
+            string sql = "SELECT * FRMO FavoriteTeams WHERE UserId = {} AND TeamId = {};";
+
+            return DbHelper.RunSelect<FavoriteTeams>(sql, userId, teamId).Count > 0;
+        }
+
+        public List<Teams> GetAllFavoriteTeams(int userId)
+        {
+            string sql = @"SELECT Teams.* FROM Teams
+                        JOIN FavoriteTeams ON Teams.Id = FavoriteTeams.TeamId
+                        WHERE FavoriteTeams.Id = {};";
+
+            return DbHelper.RunSelect<Teams>(sql, userId);    
+        }
+
+        public List<Users> GetUserById(int Id)
+        {
+            string sql = "SELECT * FROM Users WHERE Id = {};";
+
+            return DbHelper.RunSelect<Users>(sql, Id);
+        }
     }
 }

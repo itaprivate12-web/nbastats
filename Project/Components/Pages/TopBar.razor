@@ -1,6 +1,9 @@
 @using Project.Data
+@using System.Runtime.InteropServices
 @inject UserService UserService
+@inject LanguageService Lang
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <div class="topbar">
 
@@ -12,9 +15,9 @@
     <div class="search">
 
         <div class="search-box">
-            <input @bind="search" type="text" placeholder="Search for a Player or a Team... " />
-
-            @if (result.Count > 0)
+            <input placeholder="@Lang.T("SearchBarPlaceholder")" @bind="search" @oninput="AutoSearch" type="text" />
+            
+            @if (result.Count > 0 && !string.IsNullOrEmpty(search))
             {
                 <div class="search-dropdown">
 
@@ -47,14 +50,9 @@
                 </div>
 
             }
-
-
         </div>
 
-        <button class="btn btn-primary" @onclick="DoSearch"> Search </button>
-
-
-
+        <button class="btn btn-primary" @onclick="DoSearch"> @Lang.T("Search") </button>
 
         @if (result.Count == 0 && search != "")
         {
@@ -70,25 +68,107 @@
     </div>
 
     <div class="sign">
-        <button class="btn btn-primary" @onclick="Login"> Login </button>
-        <button class="btn btn-primary" @onclick="Register"> Register </button>
+
+        @if (UserService.CurrentUser != null && UserService.CurrentUser.Count > 0)
+        {
+            <div class="user" @onclick="() => GoToProfile(UserService.CurrentUser[0].Id)">
+
+                <img src="@UserService.CurrentUser[0].ProfilePicture" class="pfp" />
+                <p class="username"> @UserService.CurrentUser[0].UserName </p>
+            
+            </div>
+            <button class="btn btn-secondery" @onclick="Logout"> Logout </button>
+        }
+        else
+        {
+            <button class="btn btn-primary" @onclick="Login"> @Lang.T("Login") </button>
+            <button class="btn btn-primary" @onclick="Register"> @Lang.T("Register") </button>
+        }
+
+        <div class="lang-selector">
+            <button class="lang-btn" @onclick="ToggleLangMenu">
+                <span class="globe">🌐</span>
+            </button>
+
+            @if (showLangMenu)
+            {
+                <div class="lang-menu">
+                    <div class="lang-item" @onclick='() => SetLang("he")'>
+                        <span class="flag">🇮🇱</span>
+                        <span>עברית</span>
+                    </div>
+
+                    <div class="lang-item" @onclick='() => SetLang("en")'>
+                        <span class="flag">🇺🇸</span>
+                        <span>English</span>
+                    </div>
+                </div>
+            }
+        </div>
+
     </div>
 </div>
 
 
 @code {
     private string search = "";
+    private bool showLangMenu = false;
     private List<Search> result = new List<Search>();
 
+    protected override void OnInitialized()
+    {
+        Nav.RegisterLocationChangingHandler(OnLocationChanging);
+    }
+    private ValueTask OnLocationChanging(LocationChangingContext context)
+    {
+        StateHasChanged();
+
+        return ValueTask.CompletedTask;
+    }
+
+    void ToggleLangMenu()
+    {
+        showLangMenu = !showLangMenu;
+    }
+
+    void SetLang(string lang)
+    {
+        Lang.SetLanguage(lang);
+        showLangMenu = false;
+    }
     void GoHome()
     {
         Nav.NavigateTo("/");
     }
+
+    void GoToProfile(int Id)
+    {
+        Nav.NavigateTo($"/profile/{Id}");
+    }
     void DoSearch()
     {
+        if (string.IsNullOrEmpty(search))
+        {
+            result.Clear();
+            return;
+        }
+
         result = UserService.Search(search);
 
         Console.WriteLine($"Search for '{search}' returned {result.Count} results");
+    }
+
+    void AutoSearch(ChangeEventArgs e)
+    {
+        search = e.Value?.ToString() ?? "";
+
+        if (string.IsNullOrEmpty(search))
+        {
+            result.Clear();
+            return;
+        }
+
+        result = UserService.Search(search);
     }
 
     void GoToPlayer(int id)
@@ -106,18 +186,101 @@
 
         Nav.NavigateTo($"/team/{id}");
     }
-    void Login()
-    {
-        Nav.NavigateTo("/login");
-    }
 
-    void Register()
+    async Task Logout()
     {
-        Nav.NavigateTo("/register");
+        await JS.InvokeVoidAsync("localStorage.removeItem", "userId");
+
+        UserService.CurrentUser = null;
+        Nav.NavigateTo("/");
     }
+    void Login() { Nav.NavigateTo("/login"); }
+
+    void Register() { Nav.NavigateTo("/register"); }
 }
 
 <style>
+    .lang-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 8px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        min-width: 140px;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .lang-selector {
+        position: relative;
+        display: inline-block;
+    }
+
+    .lang-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .lang-item:hover {
+        background-color: #f1f1f1;
+    }
+
+    .lang-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 6px;
+        border-radius: 6px;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .lang-btn:hover {
+        background: #e9ecef;
+        transform: scale(1.05);
+    }
+
+    .globe {
+        font-size: 20px;
+    }
+
+    .user {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s ease;
+    }
+
+    .user:hover {
+        background: #e9ecef;
+    }
+
+    .pfp {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ccc;
+    }
+
+    .username {
+        margin: 0;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .topbar .sign {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
     /* Logo + text clickable style */
     .name {
         display: inline-flex;
@@ -185,13 +348,19 @@
     /* --- Top Bar --- */
     .topbar {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
         padding: 10px 20px;
         border: 1px solid black;
         width: 100%;
         box-sizing: border-box;
         background-color: #f8f9fa;
+    }
+
+    /* for languagae toggle */
+    .topbar>div { 
+        display: flex;
+        align-items: center;
     }
 
     .topbar .name {
