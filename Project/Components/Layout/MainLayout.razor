@@ -5,8 +5,7 @@
 @inject LanguageService Lang
 @inject IJSRuntime JS
 
-
-<div class="@Lang.CurrentDirection">
+<div class="@Lang.CurrentDirection" dir="@Lang.CurrentDirection">
     <TopBar />
     <Menu />
 
@@ -15,6 +14,16 @@
     </div>
 </div>
 
+<style>
+    .body-content {
+        padding: 20px;
+    }
+
+    [dir="rtl"] .body-content {
+        text-align: right;
+        direction: rtl;
+    }
+</style>
 
 @code {
     private bool loaded = false;
@@ -42,7 +51,6 @@
             if (!string.IsNullOrEmpty(userId))
             {
                 int userIdI = int.Parse(userId);
-
                 var user = UserService.GetUserById(userIdI);
 
                 if (user != null && user.Count > 0)

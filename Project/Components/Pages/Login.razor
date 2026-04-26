@@ -2,24 +2,25 @@
 @using Project.Data
 @using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
+@inject LanguageService Lang
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
 <div class="login-card">
-    <h2> Login </h2>
+    <h2> @Lang.T("Login") </h2>
 
-    <p> Username or Email: </p>
+    <p> @Lang.T("Name") </p>
     <input @bind="name" />
 
-    <p> Password: </p>
+    <p> @Lang.T("Password") </p>
     <input @bind="password" type="password" />
 
     <div class="remember-row">
         <input type="checkbox" @bind="rememberMe" />
-        <label> Remember Me </label>
+        <label> @Lang.T("RememberMe") </label>
     </div>
 
-    <button class="btn btn-primary" @onclick="(() => DoLogin(name, password))"> Login </button>
+    <button class="btn btn-primary" @onclick="(() => DoLogin(name, password))"> @Lang.T("Login") </button>
 
     @if (IsLoginAttempted && IsLogin)
     {
@@ -30,7 +31,7 @@
     }
     else if (IsLoginAttempted && !IsLogin)
     {
-        <p style="color:red;"> Wrong credentials </p>
+        <p style="color:red;"> @Lang.T("Credentials") </p>
     }
 
 </div>
@@ -41,6 +42,10 @@
     private bool rememberMe = false;
     List<Users> user = new List<Users>();
 
+    protected override void OnInitialized()
+    {
+        Lang.OnChange += async () => await InvokeAsync(StateHasChanged);
+    }
     async Task DoLogin(string name, string password)
     {
         user = UserService.GetUserByLogin(name, password);

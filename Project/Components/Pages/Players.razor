@@ -2,11 +2,12 @@
 @using Project.Data
 @using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
+@inject LanguageService Lang
 @inject NavigationManager Nav
 
 <div class="header-container">
 
-    <h1> All NBA Players: </h1>
+    <h1> @Lang.T("AllNbaPlayers") </h1>
 
     <div class="sort-bar">
 
@@ -37,9 +38,9 @@
             </div>
 
             <div class="player-stats">
-                <p>Points Per Game: @players.PPG</p>
-                <p>Assist Per Game: @players.APG</p>
-                <p>Rebounds Per Game: @players.RPG</p>
+                <p> @Lang.T("PPG") @players.PPG </p>
+                <p> @Lang.T("APG") @players.APG </p>
+                <p> @Lang.T("RPG") @players.RPG </p>
             </div>
 
         </div>
@@ -51,6 +52,7 @@
 
     protected override void OnInitialized()
     {
+        Lang.OnChange += async () => await InvokeAsync(StateHasChanged);
         players = UserService.GetAllPlayers();
     }
 
@@ -76,7 +78,6 @@
 }
 
 <style>
-
     .player-card:hover {
         background-color: #e9ecef;
         /* light gray on hover */

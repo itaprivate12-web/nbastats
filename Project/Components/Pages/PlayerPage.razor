@@ -2,6 +2,7 @@
 @using Project.Data
 @using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
+@inject LanguageService Lang
 @inject NavigationManager Nav
 
 
@@ -25,18 +26,18 @@
 
         <div class="player-stats">
 
-            <p> Points Per Game: @Player[0].PPG </p>
-            <p> Asists Per Game: @Player[0].APG </p>
-            <p> Rebounds Per Game: @Player[0].RPG </p>
+            <p> @Lang.T("PPG") @Player[0].PPG </p>
+            <p> @Lang.T("APG") @Player[0].APG </p>
+            <p> @Lang.T("RPG") @Player[0].RPG </p>
 
         </div>
 
         <div class="player-info">
 
-            <p> Height: @Player[0].Height </p>
-            <p> Weight: @Player[0].Weight </p>
-            <p> Draft Year: @Player[0].DraftYear </p>
-            <p> Draft Pick: @Player[0].DraftPick </p>
+            <p> @Lang.T("Height") @Player[0].Height </p>
+            <p> @Lang.T("Weight") @Player[0].Weight </p>
+            <p> @Lang.T("DraftYear") @Player[0].DraftYear </p>
+            <p> @Lang.T("DraftPick") @Player[0].DraftPick </p>
 
         </div>
     </div>
@@ -46,7 +47,7 @@
 
 @if (teamMates != null && teamMates.Count > 0)
 {
-    <h1> @Player[0].Name Teammates: </h1>
+    <h1> @Player[0].Name @Lang.T("Teammates") </h1>
     <div class="players-container">
 
         @foreach (var players in teamMates)
@@ -63,9 +64,9 @@
                 </div>
 
                 <div class="player-stat">
-                    <p>Points Per Game: @players.PPG</p>
-                    <p>Assist Per Game: @players.APG</p>
-                    <p>Rebounds Per Game: @players.RPG</p>
+                    <p> @Lang.T("PPG") @players.PPG </p>
+                    <p> @Lang.T("APG") @players.APG </p>
+                    <p> @Lang.T("RPG") @players.RPG </p>
                 </div>
 
             </div>
@@ -82,6 +83,7 @@
 
     protected override void OnInitialized()
     {
+        Lang.OnChange += async () => await InvokeAsync(StateHasChanged);
         Player = UserService.GetPlayerPageById(Id);
         teamMates = UserService.GetTeamMates(Player[0].TeamId, Id);
     }

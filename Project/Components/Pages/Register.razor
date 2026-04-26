@@ -2,32 +2,33 @@
 @using Project.Data
 @using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
+@inject LanguageService Lang
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
 <div class="register-card">
-    <h2> Create Account </h2>
+    <h2> @Lang.T("Create") </h2>
 
-    <p> Full Name: </p>
+    <p> @Lang.T("FullName") </p>
     <input @bind="fullName" />
 
-    <p> User Name: </p>
+    <p> @Lang.T("UserName")</p>
     <input @bind="userName" />
 
-    <p> Email: </p>
+    <p> @Lang.T("Email") </p>
     <input @bind="email" />
 
-    <p> Password: </p>
+    <p> @Lang.T("Password") </p>
     <input @bind="password" type="password" />
 
     <div class="remember-row">
         <input type="checkbox" @bind="rememberMe" />
-        <label> Remember Me </label>
+        <label> @Lang.T("RememberMe") </label>
     </div>
 
     @if (IsRegisterAttempted && IsRegister)
     {
-        <p style="color:green;"> User created successfully </p>
+        <p style="color:green;"> @Lang.T("Usercreated") </p>
         Direct();
     }
 
@@ -35,7 +36,7 @@
     </button>
 
     <p class="login-link">
-        Already have an account?
+        @Lang.T("Already")
         <a href="/login"> Login </a>
     </p>
 
@@ -47,6 +48,10 @@
     public bool IsRegisterAttempted = false, IsRegister = false;
     private bool rememberMe = false;
 
+    protected override void OnInitialized()
+    {
+        Lang.OnChange += async () => await InvokeAsync(StateHasChanged);
+    }
     async Task DoRegister(string fullName, string userName, string email, string password)
     {
         var user = UserService.GetUserByLogin(userName, password);

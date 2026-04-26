@@ -30,9 +30,9 @@
             </div>
 
             <div class="player-stats">
-                <p>Points Per Game: @players.PPG</p>
-                <p>Assist Per Game: @players.APG</p>
-                <p>Rebounds Per Game: @players.RPG</p>
+                <p>@Lang.T("PPG") @players.PPG</p>
+                <p>@Lang.T("APG") @players.APG</p>
+                <p>@Lang.T("RPG") @players.RPG</p>
             </div>
 
             <button class="fav-btn" @onclick:stopPropagation="true" @onclick="() => ToggleStarPlayer(players.Id)">

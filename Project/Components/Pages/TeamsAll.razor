@@ -2,9 +2,10 @@
 @using Project.Data
 @using System.Diagnostics.Eventing.Reader
 @inject UserService UserService
+@inject LanguageService Lang
 @inject NavigationManager Nav
 
-<h1> All NBA Teams: </h1>
+<h1> @Lang.T("AllNbaTeams") </h1>
 
 <hr />
 
@@ -25,6 +26,7 @@
 
     protected override void OnInitialized()
     {
+        Lang.OnChange += async () => await InvokeAsync(StateHasChanged);
         teams = UserService.GetAllTeams();
     }
 
@@ -35,10 +37,11 @@
 }
 
 <style>
-
     .team-card:hover {
-        background-color: #e9ecef; /* light gray on hover */
-        transform: scale(1.02); /* tiny zoom effect */
+        background-color: #e9ecef;
+        /* light gray on hover */
+        transform: scale(1.02);
+        /* tiny zoom effect */
         transition: background-color 0.2s ease, transform 0.1s ease;
     }
 
